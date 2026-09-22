@@ -1,15 +1,22 @@
 package com.hakki.nextgallery.ui
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.LazyHeaders
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.hakki.nextgallery.R
 import com.hakki.nextgallery.model.GalleryListItem
+import java.util.concurrent.atomic.AtomicBoolean
 
 private const val TYPE_HEADER = 0
 private const val TYPE_PHOTO = 1
@@ -22,7 +29,6 @@ class GalleryAdapter(
 
     private var rows: List<GalleryListItem> = emptyList()
 
-    /** Read-only snapshot, used by the GridLayoutManager's SpanSizeLookup. */
     val currentRows: List<GalleryListItem>
         get() = rows
 
@@ -63,13 +69,50 @@ class GalleryAdapter(
 
     inner class PhotoVH(itemView: android.view.View) : RecyclerView.ViewHolder(itemView) {
         private val image: ImageView = itemView.findViewById(R.id.imageThumb)
+
         fun bind(photo: GalleryListItem.Photo) {
             val url = GlideUrl(
                 thumbUrlFor(photo.item.relativePath),
                 LazyHeaders.Builder().addHeader("Authorization", authHeader).build()
             )
-            Glide.with(image).load(url).centerCrop().into(image)
+            Glide.with(image)
+                .load(url)
+                .error(android.R.drawable.stat_notify_error)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        if (!errorShown.getAndSet(true)) {
+                            val cause = e?.rootCauses?.firstOrNull()?.toString()
+                                ?: e?.message
+                                ?: "unknown error"
+                            Toast.makeText(
+                                itemView.context,
+                                "Image load failed: $cause",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable,
+                        model: Any,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource,
+                        isFirstResource: Boolean
+                    ): Boolean = false
+                })
+                .centerCrop()
+                .into(image)
             itemView.setOnClickListener { onPhotoClick(photo.originalIndex) }
         }
+    }
+
+    companion object {
+        private val errorShown = AtomicBoolean(false)
     }
 }
