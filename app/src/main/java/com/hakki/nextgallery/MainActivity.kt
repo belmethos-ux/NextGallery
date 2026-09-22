@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         val authHeader = client.basicAuthHeader()
         adapter = GalleryAdapter(
             authHeader = authHeader,
-            thumbUrlFor = { relPath -> client.thumbnailUrl(relPath) },
+            thumbUrlFor = { relPath -> client.originalUrl(relPath) },
             onPhotoClick = { index -> openViewer(index) }
         )
 
