@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NextGallery</string>
+    <string name="server_url_hint">Server URL (e.g. https://nc.idealmakina.co)</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">App Password</string>
+    <string name="folder_hint">Photos folder (leave blank for entire account)</string>
+    <string name="login_button">Connect</string>
+    <string name="login_help">Use an app password, not your main password: Nextcloud Settings \u2192 Security \u2192 Devices &amp; sessions \u2192 Create new app password.</string>
+    <string name="loading">Loading your photos\u2026</string>
+    <string name="empty_state">No photos found in this folder.</string>
+    <string name="error_generic">Something went wrong. Pull down to retry.</string>
+    <string name="logout">Log out</string>
+</resources>
